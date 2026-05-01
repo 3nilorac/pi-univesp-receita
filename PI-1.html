@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PI-1 - Emissão de Receitas</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos específicos para impressão */
+        @media print {
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .print-area {
+                width: 100% !important;
+                max-width: none !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 2cm !important;
+                margin: 0 !important;
+            }
+
+            @page {
+                margin: 0;
+            }
+
+            /* Remove margens padrão do navegador se possível */
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
+
+    <!-- Header (Oculto na Impressão se desejar, mas vamos manter no layout principal) -->
+    <header class="bg-blue-700 text-white p-4 shadow-md no-print">
+        <div class="container mx-auto max-w-7xl flex items-center justify-between">
+            <h1 class="text-2xl font-bold flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                PI-1
+            </h1>
+            <p class="text-blue-100 text-sm hidden sm:block">Emissão de Receitas Veterinárias Digitais</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto max-w-7xl p-4 my-6 flex flex-col lg:flex-row gap-8">
+
+        <!-- Formulários de Entrada (Esquerda/Superior) - Ocultos na Impressão -->
+        <section id="input-section" class="w-full lg:w-5/12 xl:w-1/3 flex flex-col gap-6 no-print">
+
+            <!-- Botão de Ação Principal -->
+            <div
+                class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center sticky top-4 z-10">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-700">Ações</h2>
+                    <p class="text-xs text-slate-500">Gere o documento final</p>
+                </div>
+                <button onclick="Controller.printPrescription()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    Imprimir / PDF
+                </button>
+            </div>
+
+            <!-- Dados do Profissional -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold mb-4 text-blue-900 border-b pb-2">Dados do Veterinário</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1" for="vet-name">Nome
+                            Completo</label>
+                        <input type="text" id="vet-name"
+                            oninput="Controller.updateField('professional', 'name', this.value)"
+                            class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                            placeholder="Ex: Dr. João Silva">
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1" for="vet-crmv">CRMV</label>
+                            <input type="text" id="vet-crmv"
+                                oninput="Controller.updateField('professional', 'crmv', this.value)"
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                placeholder="Ex: 12345/SP">
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1"
+                                for="vet-phone">Telefone</label>
+                            <input type="text" id="vet-phone"
+                                oninput="Controller.updateField('professional', 'phone', this.value)"
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                placeholder="(00) 00000-0000">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dados do Tutor -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold mb-4 text-blue-900 border-b pb-2">Dados do Tutor</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1" for="tutor-name">Nome do
+                            Tutor</label>
+                        <input type="text" id="tutor-name" oninput="Controller.updateField('tutor', 'name', this.value)"
+                            class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                            placeholder="Nome completo do responsável">
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1" for="tutor-cpf">CPF</label>
+                            <input type="text" id="tutor-cpf"
+                                oninput="Controller.updateField('tutor', 'cpf', this.value)"
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                placeholder="000.000.000-00">
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1"
+                                for="tutor-phone">Contato</label>
+                            <input type="text" id="tutor-phone"
+                                oninput="Controller.updateField('tutor', 'phone', this.value)"
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                placeholder="(00) 00000-0000">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dados do Paciente -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold mb-4 text-blue-900 border-b pb-2">Dados do Paciente (Animal)</h2>
+                <div class="space-y-4">
+                    <div class="flex gap-4">
+                        <div class="w-2/3">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1" for="patient-name">Nome do
+                                Animal</label>
+                            <input type="text" id="patient-name"
+                                oninput="Controller.updateField('patient', 'name', this.value)"
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                placeholder="Ex: Rex">
+                        </div>
+                        <div class="w-1/3">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1" for="patient-weight">Peso
+                                (kg)</label>
+                            <input type="number" step="0.1" id="patient-weight"
+                                oninput="Controller.updateField('patient', 'weight', this.value)"
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                placeholder="0.0">
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1"
+                                for="patient-species">Espécie</label>
+                            <select id="patient-species"
+                                onchange="Controller.updateField('patient', 'species', this.value)"
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                                <option value="">Selecione...</option>
+                                <option value="Canina">Canina (Cachorro)</option>
+                                <option value="Felina">Felina (Gato)</option>
+                                <option value="Equina">Equina (Cavalo)</option>
+                                <option value="Outra">Outra</option>
+                            </select>
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1"
+                                for="patient-breed">Raça</label>
+                            <input type="text" id="patient-breed"
+                                oninput="Controller.updateField('patient', 'breed', this.value)"
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                placeholder="Ex: Poodle">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Adição de Medicamentos -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold mb-4 text-blue-900 border-b pb-2">Prescrição</h2>
+                <div class="space-y-4" id="med-form">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1" for="med-name">Medicamento
+                            *</label>
+                        <input type="text" id="med-name"
+                            class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                            placeholder="Nome comercial ou princípio ativo">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1" for="med-dose">Concentração /
+                            Apresentação</label>
+                        <input type="text" id="med-dose"
+                            class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                            placeholder="Ex: 50mg, 1 Frasco, 10 Comprimidos">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1" for="med-posology">Posologia
+                            (Uso) *</label>
+                        <textarea id="med-posology" rows="2"
+                            class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition resize-none"
+                            placeholder="Instruções de como administrar, frequência e duração."></textarea>
+                    </div>
+                    <button type="button" onclick="Controller.addMedicine()"
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded transition flex justify-center items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Adicionar à Receita
+                    </button>
+                    <div id="med-error" class="hidden text-red-600 text-sm font-medium mt-2">Por favor, preencha o Nome
+                        e a Posologia.</div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Preview da Receita (Direita/Inferior) - Este será o conteúdo impresso -->
+        <section id="preview-section" class="w-full lg:w-7/12 xl:w-2/3 flex justify-center print:w-full print:block">
+            <!-- Canvas da Folha (A4 proportion sim) -->
+            <div id="prescription-paper"
+                class="print-area bg-white shadow-xl border border-slate-200 w-full max-w-3xl rounded min-h-[1000px] p-8 md:p-12 relative flex flex-col">
+
+                <!-- Cabeçalho da Receita -->
+                <div class="text-center border-b-2 border-slate-800 pb-6 mb-6">
+                    <h2 id="out-vet-name" class="text-3xl font-bold text-slate-800 uppercase tracking-wider mb-2">NOME
+                        DO VETERINÁRIO</h2>
+                    <p class="text-lg text-slate-600 font-medium">Médico(a) Veterinário(a) - CRMV: <span
+                            id="out-vet-crmv">______</span></p>
+                    <p class="text-slate-500 mt-1" id="out-vet-phone">Telefone: ______</p>
+                </div>
+
+                <!-- Identificação do Paciente/Tutor -->
+                <div
+                    class="bg-slate-50 border border-slate-300 p-4 rounded mb-8 text-slate-800 text-sm leading-relaxed">
+                    <div class="grid grid-cols-2 gap-y-2 gap-x-4">
+                        <div><strong class="text-slate-600">Tutor(a):</strong> <span id="out-tutor-name"
+                                class="font-medium text-base text-slate-900 border-b border-dotted border-slate-400 pb-1 min-w-[200px] inline-block"></span>
+                        </div>
+                        <div><strong class="text-slate-600">CPF:</strong> <span id="out-tutor-cpf"
+                                class="font-medium text-slate-900"></span></div>
+                        <div><strong class="text-slate-600">Contato Tutor:</strong> <span id="out-tutor-phone"
+                                class="font-medium text-slate-900"></span></div>
+
+                        <div class="col-span-2 mt-2 pt-2 border-t border-slate-200 grid grid-cols-2 gap-2">
+                            <div><strong class="text-slate-600">Paciente:</strong> <span id="out-patient-name"
+                                    class="font-semibold text-lg text-slate-900"></span></div>
+                            <div><strong class="text-slate-600">Espécie:</strong> <span id="out-patient-species"
+                                    class="font-medium text-slate-900"></span></div>
+                            <div><strong class="text-slate-600">Raça:</strong> <span id="out-patient-breed"
+                                    class="font-medium text-slate-900"></span></div>
+                            <div><strong class="text-slate-600">Peso:</strong> <span id="out-patient-weight"
+                                    class="font-medium text-slate-900"></span> <span id="out-weight-unit"
+                                    class="text-slate-900 hidden">kg</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Prescrição -->
+                <div class="flex-grow">
+                    <h3 class="text-xl font-bold text-center mb-6 uppercase tracking-widest text-slate-800">Uso
+                        Veterinário</h3>
+
+                    <div id="out-prescription-list" class="space-y-6 text-slate-800">
+                        <!-- Lista vazia por padrão; o JS preencherá aqui -->
+                        <div class="text-center text-slate-400 italic text-sm mt-10 no-print" id="empty-state">
+                            Nenhum medicamento adicionado ainda.<br>Preencha o formulário para visualizar os itens aqui.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rodapé / Assinatura -->
+                <div class="mt-16 pt-8 border-t border-slate-300">
+                    <div class="flex justify-between items-end">
+                        <div class="text-sm text-slate-600">
+                            Data: <span id="out-date"
+                                class="font-medium text-slate-800 border-b border-black w-32 inline-block text-center"></span>
+                        </div>
+                        <div class="text-center w-64">
+                            <div class="border-b border-black mb-2 h-10"></div>
+                            <p class="font-bold text-slate-800 text-sm" id="out-sign-name">Assinatura / Carimbo</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- App Logic (MVC) -->
+    <script>
+        // MODEL: Armazena o estado normalizado da aplicação
+        const Model = {
+            state: {
+                professional: { name: '', crmv: '', phone: '' },
+                tutor: { name: '', cpf: '', phone: '' },
+                patient: { name: '', species: '', breed: '', weight: '' },
+                prescription: [] // Array de objetos { id, name, dose, posology }
+            },
+
+            // Atualiza um campo específico de uma entidade
+            updateData(entity, field, value) {
+                if (this.state[entity]) {
+                    this.state[entity][field] = value;
+                }
+            },
+
+            // Adiciona um novo medicamento ao array de prescrições
+            addMedicine(med) {
+                const id = Date.now().toString();
+                this.state.prescription.push({ id, ...med });
+                return id;
+            },
+
+            // Remove um medicamento pelo ID
+            removeMedicine(id) {
+                this.state.prescription = this.state.prescription.filter(med => med.id !== id);
+            }
+        };
+
+        // VIEW: Gerencia as atualizações no DOM reactivamente
+        const View = {
+            // Liga um valor de texto a um elemento do DOM
+            bindTextBinding(id, value, fallback = '') {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.textContent = value || fallback;
+                }
+            },
+
+            // Atualiza o cabeçalho e rodapé do veterinário
+            renderProfessional(data) {
+                this.bindTextBinding('out-vet-name', data.name, 'NOME DO VETERINÁRIO');
+                this.bindTextBinding('out-sign-name', data.name || 'Assinatura / Carimbo');
+                this.bindTextBinding('out-vet-crmv', data.crmv, '______');
+                this.bindTextBinding('out-vet-phone', data.phone ? `Telefone: ${data.phone}` : 'Telefone: ______');
+            },
+
+            // Atualiza dados do tutor
+            renderTutor(data) {
+                this.bindTextBinding('out-tutor-name', data.name);
+                this.bindTextBinding('out-tutor-cpf', data.cpf);
+                this.bindTextBinding('out-tutor-phone', data.phone);
+            },
+
+            // Atualiza dados do paciente
+            renderPatient(data) {
+                this.bindTextBinding('out-patient-name', data.name);
+                this.bindTextBinding('out-patient-species', data.species);
+                this.bindTextBinding('out-patient-breed', data.breed);
+                this.bindTextBinding('out-patient-weight', data.weight);
+
+                const weightUnit = document.getElementById('out-weight-unit');
+                if (data.weight) {
+                    weightUnit.classList.remove('hidden');
+                } else {
+                    weightUnit.classList.add('hidden');
+                }
+            },
+
+            // Renderiza a lista de medicamentos dinamicamente
+            renderPrescription(items) {
+                const container = document.getElementById('out-prescription-list');
+                container.innerHTML = ''; // Limpa atual
+
+                if (items.length === 0) {
+                    container.innerHTML = `<div class="text-center text-slate-400 italic text-sm mt-10 no-print" id="empty-state">
+                        Nenhum medicamento adicionado ainda.<br>Preencha o formulário para visualizar os itens aqui.
+                    </div>`;
+                    return;
+                }
+
+                items.forEach((item, index) => {
+                    const block = document.createElement('div');
+                    block.className = 'relative pl-8 pr-12 page-break-inside-avoid shadow-sm p-4 border border-slate-100 rounded bg-white print:border-none print:shadow-none print:p-0 print:pr-0 print:pl-6 print:mb-4';
+
+                    // Número do Item
+                    const numberMark = document.createElement('span');
+                    numberMark.className = 'absolute left-2 top-4 font-bold text-lg text-slate-800 print:top-0 print:left-0';
+                    numberMark.textContent = `${index + 1}.`;
+
+                    // Cabeçalho do medicamento
+                    const header = document.createElement('div');
+                    header.className = 'flex justify-between items-baseline mb-1';
+
+                    const title = document.createElement('h4');
+                    title.className = 'font-bold text-lg text-slate-900 border-b border-black inline-block';
+                    title.textContent = item.name;
+
+                    const dose = document.createElement('span');
+                    dose.className = 'font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded print:bg-transparent print:p-0 pl-2';
+                    dose.textContent = item.dose || '';
+
+                    header.appendChild(title);
+                    if (item.dose) header.appendChild(dose);
+
+                    // Posologia
+                    const posology = document.createElement('p');
+                    posology.className = 'text-slate-800 mt-2 whitespace-pre-wrap leading-relaxed print:text-justify';
+                    posology.textContent = item.posology;
+
+                    // Botão Remover (Oculto na impressão)
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'absolute right-2 top-4 text-red-500 hover:text-red-700 p-1 bg-red-50 hover:bg-red-100 rounded no-print transition';
+                    removeBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>`;
+                    removeBtn.onclick = () => Controller.removeMedicine(item.id);
+
+                    block.appendChild(numberMark);
+                    block.appendChild(header);
+                    block.appendChild(posology);
+                    block.appendChild(removeBtn);
+
+                    container.appendChild(block);
+                });
+            },
+
+            // Exibe a data de hoje formatada
+            renderDate() {
+                const today = new Date();
+                const formatter = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                this.bindTextBinding('out-date', formatter.format(today));
+            },
+
+            // Limpa o formulário de medicamento
+            clearMedicineForm() {
+                document.getElementById('med-name').value = '';
+                document.getElementById('med-dose').value = '';
+                document.getElementById('med-posology').value = '';
+                document.getElementById('med-error').classList.add('hidden');
+                document.getElementById('med-name').focus();
+            },
+
+            // Mostra erro no formulário
+            showMedicineError() {
+                document.getElementById('med-error').classList.remove('hidden');
+            }
+        };
+
+        // CONTROLLER: Intermedia eventos da interface do usuário e manipuladores de modelo/visão
+        const Controller = {
+            // Inicializa a aplicação
+            init() {
+                View.renderDate();
+                // Opcional: Popular com dados fake para fins de prototipagem rápida
+            },
+
+            // Tratador universal de input para campos normais
+            updateField(entity, field, value) {
+                Model.updateData(entity, field, value);
+
+                // Despacha a atualização para as Views adequadas
+                if (entity === 'professional') View.renderProfessional(Model.state.professional);
+                if (entity === 'tutor') View.renderTutor(Model.state.tutor);
+                if (entity === 'patient') View.renderPatient(Model.state.patient);
+            },
+
+            // Adiciona medicamento validando os campos obrigatórios
+            addMedicine() {
+                const name = document.getElementById('med-name').value.trim();
+                const dose = document.getElementById('med-dose').value.trim();
+                const posology = document.getElementById('med-posology').value.trim();
+
+                if (!name || !posology) {
+                    View.showMedicineError();
+                    return;
+                }
+
+                Model.addMedicine({ name, dose, posology });
+                View.renderPrescription(Model.state.prescription);
+                View.clearMedicineForm();
+            },
+
+            // Remove medicamento e re-renderiza
+            removeMedicine(id) {
+                Model.removeMedicine(id);
+                View.renderPrescription(Model.state.prescription);
+            },
+
+            // Ação principal de impressão
+            printPrescription() {
+                // A manipulação visual de exibir só o papel e ocultar o resto é feita pelo CSS @media print (.no-print)
+                window.print();
+            }
+        };
+
+        // Boot da Aplicação
+        document.addEventListener('DOMContentLoaded', () => {
+            Controller.init();
+
+            // Suporte para adicionar medicamento com "Enter" no campo posologia
+            document.getElementById('med-posology').addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    e.preventDefault();
+                    Controller.addMedicine();
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
+// Jackson Barbosa - 11 9 8695-9395
