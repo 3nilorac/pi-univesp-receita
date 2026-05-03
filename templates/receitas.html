@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Receitas Salvas - PI-1{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-slate-800">Receitas Salvas</h2>
+        <a href="{{ url_for('index') }}"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
+            </svg>
+            Nova Receita
+        </a>
+    </div>
+
+    {% if receitas %}
+    <div class="space-y-3">
+        {% for r in receitas %}
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="flex-grow">
+                    <div class="flex items-center gap-3 mb-1">
+                        <h3 class="font-bold text-lg text-slate-800">{{ r.paciente_nome }}</h3>
+                        {% if r.paciente_especie %}
+                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">{{ r.paciente_especie }}</span>
+                        {% endif %}
+                    </div>
+                    <p class="text-sm text-slate-600">
+                        <span class="font-medium">Tutor:</span> {{ r.tutor_nome }}
+                        &middot;
+                        <span class="font-medium">Vet:</span> {{ r.vet_nome }} (CRMV {{ r.vet_crmv }})
+                    </p>
+                    <p class="text-xs text-slate-400 mt-1">
+                        {{ r.data_formatada }} &middot; {{ r.medicamentos|length }} medicamento(s)
+                    </p>
+                </div>
+                <div class="flex gap-2 flex-shrink-0">
+                    <a href="{{ url_for('ver_receita', id=r.id) }}"
+                        class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2 px-4 rounded-lg transition text-sm">
+                        Visualizar
+                    </a>
+                    <form method="POST" action="{{ url_for('excluir_receita', id=r.id) }}"
+                        onsubmit="return confirm('Tem certeza que deseja excluir esta receita?')">
+                        <button type="submit"
+                            class="bg-red-50 hover:bg-red-100 text-red-600 font-medium py-2 px-4 rounded-lg transition text-sm">
+                            Excluir
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-slate-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <p class="text-slate-500 text-lg">Nenhuma receita salva ainda.</p>
+        <p class="text-slate-400 text-sm mt-1">Clique em "Nova Receita" para criar a primeira.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

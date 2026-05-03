@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+{% block title %}Nova Receita - PI-1{% endblock %}
+
+{% block content %}
+<form method="POST" action="{{ url_for('criar_receita') }}" id="receita-form">
+    <div class="flex flex-col lg:flex-row gap-8">
+
+        <!-- Formulários de Entrada -->
+        <section class="w-full lg:w-5/12 xl:w-1/3 flex flex-col gap-6 no-print">
+
+            <!-- Ações -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center sticky top-4 z-10">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-700">Nova Receita</h2>
+                    <p class="text-xs text-slate-500">Preencha e salve o documento</p>
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        Salvar Receita
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dados do Veterinário -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold mb-4 text-blue-900 border-b pb-2">Dados do Veterinário</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1" for="vet_nome">Nome Completo *</label>
+                        <input type="text" name="vet_nome" id="vet_nome" required
+                            class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                            placeholder="Ex: Dr. João Silva"
+                            oninput="Preview.update()">
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1" for="vet_crmv">CRMV *</label>
+                            <input type="text" name="vet_crmv" id="vet_crmv" required
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                placeholder="Ex: 12345/SP"
+                                oninput="Preview.update()">
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1" for="vet_telefone">Telefone</label>
+                            <input type="text" name="vet_telefone" id="vet_telefone"
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                placeholder="(00) 00000-0000"
+                                oninput="Preview.update()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dados do Tutor -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold mb-4 text-blue-900 border-b pb-2">Dados do Tutor</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1" for="tutor_nome">Nome do Tutor *</label>
+                        <input type="text" name="tutor_nome" id="tutor_nome" required
+                            class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                            placeholder="Nome completo do responsável"
+                            oninput="Preview.update()">
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1" for="tutor_cpf">CPF</label>
+                            <input type="text" name="tutor_cpf" id="tutor_cpf"
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                placeholder="000.000.000-00"
+                                oninput="Preview.update()">
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1" for="tutor_telefone">Contato</label>
+                            <input type="text" name="tutor_telefone" id="tutor_telefone"
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                placeholder="(00) 00000-0000"
+                                oninput="Preview.update()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dados do Paciente -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold mb-4 text-blue-900 border-b pb-2">Dados do Paciente (Animal)</h2>
+                <div class="space-y-4">
+                    <div class="flex gap-4">
+                        <div class="w-2/3">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1" for="paciente_nome">Nome do Animal *</label>
+                            <input type="text" name="paciente_nome" id="paciente_nome" required
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                placeholder="Ex: Rex"
+                                oninput="Preview.update()">
+                        </div>
+                        <div class="w-1/3">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1" for="paciente_peso">Peso (kg)</label>
+                            <input type="number" step="0.1" name="paciente_peso" id="paciente_peso"
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                placeholder="0.0"
+                                oninput="Preview.update()">
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1" for="paciente_especie">Espécie</label>
+                            <select name="paciente_especie" id="paciente_especie"
+                                onchange="Preview.update()"
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                                <option value="">Selecione...</option>
+                                <option value="Canina">Canina (Cachorro)</option>
+                                <option value="Felina">Felina (Gato)</option>
+                                <option value="Equina">Equina (Cavalo)</option>
+                                <option value="Outra">Outra</option>
+                            </select>
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1" for="paciente_raca">Raça</label>
+                            <input type="text" name="paciente_raca" id="paciente_raca"
+                                class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                                placeholder="Ex: Poodle"
+                                oninput="Preview.update()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Adição de Medicamentos -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold mb-4 text-blue-900 border-b pb-2">Prescrição</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Medicamento *</label>
+                        <input type="text" id="inp-med-nome"
+                            class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                            placeholder="Nome comercial ou princípio ativo">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Concentração / Apresentação</label>
+                        <input type="text" id="inp-med-concentracao"
+                            class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition"
+                            placeholder="Ex: 50mg, 1 Frasco, 10 Comprimidos">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Posologia (Uso) *</label>
+                        <textarea id="inp-med-posologia" rows="2"
+                            class="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 outline-none transition resize-none"
+                            placeholder="Instruções de como administrar, frequência e duração."></textarea>
+                    </div>
+                    <button type="button" onclick="MedList.add()"
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded transition flex justify-center items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
+                        </svg>
+                        Adicionar à Receita
+                    </button>
+                    <p id="med-error" class="hidden text-red-600 text-sm font-medium">Por favor, preencha o Nome e a Posologia.</p>
+                </div>
+
+                <!-- Lista de medicamentos adicionados -->
+                <div id="med-list" class="mt-4 space-y-2"></div>
+            </div>
+
+        </section>
+
+        <!-- Preview da Receita -->
+        <section class="w-full lg:w-7/12 xl:w-2/3 flex justify-center print:w-full print:block">
+            <div class="print-area bg-white shadow-xl border border-slate-200 w-full max-w-3xl rounded min-h-[1000px] p-8 md:p-12 relative flex flex-col">
+
+                <div class="text-center border-b-2 border-slate-800 pb-6 mb-6">
+                    <h2 id="out-vet-name" class="text-3xl font-bold text-slate-800 uppercase tracking-wider mb-2">NOME DO VETERINÁRIO</h2>
+                    <p class="text-lg text-slate-600 font-medium">Médico(a) Veterinário(a) - CRMV: <span id="out-vet-crmv">______</span></p>
+                    <p class="text-slate-500 mt-1" id="out-vet-phone">Telefone: ______</p>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-300 p-4 rounded mb-8 text-slate-800 text-sm leading-relaxed">
+                    <div class="grid grid-cols-2 gap-y-2 gap-x-4">
+                        <div><strong class="text-slate-600">Tutor(a):</strong> <span id="out-tutor-name" class="font-medium text-base text-slate-900 border-b border-dotted border-slate-400 pb-1 min-w-[200px] inline-block"></span></div>
+                        <div><strong class="text-slate-600">CPF:</strong> <span id="out-tutor-cpf" class="font-medium text-slate-900"></span></div>
+                        <div><strong class="text-slate-600">Contato Tutor:</strong> <span id="out-tutor-phone" class="font-medium text-slate-900"></span></div>
+                        <div class="col-span-2 mt-2 pt-2 border-t border-slate-200 grid grid-cols-2 gap-2">
+                            <div><strong class="text-slate-600">Paciente:</strong> <span id="out-patient-name" class="font-semibold text-lg text-slate-900"></span></div>
+                            <div><strong class="text-slate-600">Espécie:</strong> <span id="out-patient-species" class="font-medium text-slate-900"></span></div>
+                            <div><strong class="text-slate-600">Raça:</strong> <span id="out-patient-breed" class="font-medium text-slate-900"></span></div>
+                            <div><strong class="text-slate-600">Peso:</strong> <span id="out-patient-weight" class="font-medium text-slate-900"></span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-grow">
+                    <h3 class="text-xl font-bold text-center mb-6 uppercase tracking-widest text-slate-800">Uso Veterinário</h3>
+                    <div id="out-prescription-list" class="space-y-6 text-slate-800">
+                        <div class="text-center text-slate-400 italic text-sm mt-10" id="empty-state">
+                            Nenhum medicamento adicionado ainda.<br>Preencha o formulário para visualizar os itens aqui.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-16 pt-8 border-t border-slate-300">
+                    <div class="flex justify-between items-end">
+                        <div class="text-sm text-slate-600">
+                            Data: <span id="out-date" class="font-medium text-slate-800 border-b border-black w-32 inline-block text-center"></span>
+                        </div>
+                        <div class="text-center w-64">
+                            <div class="border-b border-black mb-2 h-10"></div>
+                            <p class="font-bold text-slate-800 text-sm" id="out-sign-name">Assinatura / Carimbo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Hidden inputs container for medicines -->
+    <div id="med-hidden-inputs"></div>
+</form>
+
+<script>
+    let medCounter = 0;
+    const medicines = [];
+
+    const MedList = {
+        add() {
+            const nome = document.getElementById('inp-med-nome').value.trim();
+            const concentracao = document.getElementById('inp-med-concentracao').value.trim();
+            const posologia = document.getElementById('inp-med-posologia').value.trim();
+
+            if (!nome || !posologia) {
+                document.getElementById('med-error').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('med-error').classList.add('hidden');
+
+            medicines.push({ id: medCounter++, nome, concentracao, posologia });
+            this.render();
+
+            document.getElementById('inp-med-nome').value = '';
+            document.getElementById('inp-med-concentracao').value = '';
+            document.getElementById('inp-med-posologia').value = '';
+            document.getElementById('inp-med-nome').focus();
+        },
+
+        remove(id) {
+            const idx = medicines.findIndex(m => m.id === id);
+            if (idx !== -1) medicines.splice(idx, 1);
+            this.render();
+        },
+
+        render() {
+            const list = document.getElementById('med-list');
+            const hidden = document.getElementById('med-hidden-inputs');
+            const preview = document.getElementById('out-prescription-list');
+
+            list.innerHTML = '';
+            hidden.innerHTML = '';
+            preview.innerHTML = '';
+
+            if (medicines.length === 0) {
+                preview.innerHTML = `<div class="text-center text-slate-400 italic text-sm mt-10">
+                    Nenhum medicamento adicionado ainda.<br>Preencha o formulário para visualizar os itens aqui.</div>`;
+                return;
+            }
+
+            medicines.forEach((med, i) => {
+                // Card na lista lateral
+                list.innerHTML += `
+                    <div class="flex items-start gap-2 bg-slate-50 p-3 rounded border border-slate-200">
+                        <div class="flex-grow">
+                            <p class="font-semibold text-sm text-slate-800">${i + 1}. ${this.esc(med.nome)}</p>
+                            ${med.concentracao ? `<p class="text-xs text-slate-500">${this.esc(med.concentracao)}</p>` : ''}
+                            <p class="text-xs text-slate-600 mt-1">${this.esc(med.posologia)}</p>
+                        </div>
+                        <button type="button" onclick="MedList.remove(${med.id})"
+                            class="text-red-500 hover:text-red-700 p-1 bg-red-50 hover:bg-red-100 rounded transition flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>`;
+
+                // Hidden inputs para o formulário
+                hidden.innerHTML += `
+                    <input type="hidden" name="med_nome[]" value="${this.escAttr(med.nome)}">
+                    <input type="hidden" name="med_concentracao[]" value="${this.escAttr(med.concentracao)}">
+                    <input type="hidden" name="med_posologia[]" value="${this.escAttr(med.posologia)}">`;
+
+                // Preview da receita
+                preview.innerHTML += `
+                    <div class="relative pl-8 pr-2 page-break-inside-avoid shadow-sm p-4 border border-slate-100 rounded bg-white print:border-none print:shadow-none print:p-0 print:pr-0 print:pl-6 print:mb-4">
+                        <span class="absolute left-2 top-4 font-bold text-lg text-slate-800 print:top-0 print:left-0">${i + 1}.</span>
+                        <div class="flex justify-between items-baseline mb-1">
+                            <h4 class="font-bold text-lg text-slate-900 border-b border-black inline-block">${this.esc(med.nome)}</h4>
+                            ${med.concentracao ? `<span class="font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded print:bg-transparent print:p-0 pl-2">${this.esc(med.concentracao)}</span>` : ''}
+                        </div>
+                        <p class="text-slate-800 mt-2 whitespace-pre-wrap leading-relaxed print:text-justify">${this.esc(med.posologia)}</p>
+                    </div>`;
+            });
+        },
+
+        esc(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        },
+
+        escAttr(str) {
+            return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+    };
+
+    const Preview = {
+        update() {
+            const v = (id) => document.getElementById(id)?.value || '';
+            const t = (id, val, fallback) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val || fallback || '';
+            };
+
+            t('out-vet-name', v('vet_nome'), 'NOME DO VETERINÁRIO');
+            t('out-sign-name', v('vet_nome') || 'Assinatura / Carimbo');
+            t('out-vet-crmv', v('vet_crmv'), '______');
+
+            const phone = v('vet_telefone');
+            t('out-vet-phone', phone ? `Telefone: ${phone}` : 'Telefone: ______');
+
+            t('out-tutor-name', v('tutor_nome'));
+            t('out-tutor-cpf', v('tutor_cpf'));
+            t('out-tutor-phone', v('tutor_telefone'));
+
+            t('out-patient-name', v('paciente_nome'));
+            t('out-patient-species', v('paciente_especie'));
+            t('out-patient-breed', v('paciente_raca'));
+
+            const peso = v('paciente_peso');
+            t('out-patient-weight', peso ? `${peso} kg` : '');
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const today = new Date();
+        const fmt = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        document.getElementById('out-date').textContent = fmt.format(today);
+
+        document.getElementById('inp-med-posologia').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                MedList.add();
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PI-1 - Emissão de Receitas{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            body { background: white; margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+            .print-area {
+                width: 100% !important; max-width: none !important;
+                border: none !important; box-shadow: none !important;
+                padding: 2cm !important; margin: 0 !important;
+            }
+            @page { margin: 0; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
+    <header class="bg-blue-700 text-white p-4 shadow-md no-print">
+        <div class="container mx-auto max-w-7xl flex items-center justify-between">
+            <a href="{{ url_for('index') }}" class="text-2xl font-bold flex items-center gap-2 hover:text-blue-100 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                PI-1
+            </a>
+            <nav class="flex items-center gap-4">
+                <p class="text-blue-100 text-sm hidden sm:block">Emissão de Receitas Veterinárias Digitais</p>
+                <a href="{{ url_for('index') }}" class="text-sm bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded transition">Nova Receita</a>
+                <a href="{{ url_for('listar_receitas') }}" class="text-sm bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded transition">Receitas Salvas</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto max-w-7xl p-4 my-6">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="mb-4 no-print">
+            {% for category, message in messages %}
+            <div class="p-3 rounded-lg mb-2 text-sm font-medium
+                {% if category == 'error' %}bg-red-100 text-red-800 border border-red-200
+                {% else %}bg-emerald-100 text-emerald-800 border border-emerald-200{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
