@@ -24,12 +24,19 @@
                     Excluir
                 </button>
             </form>
+            <button onclick="downloadPDF()"
+                class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                </svg>
+                Download PDF
+            </button>
             <button onclick="window.print()"
                 class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd"/>
                 </svg>
-                Imprimir / PDF
+                Imprimir
             </button>
         </div>
     </div>
@@ -64,10 +71,9 @@
 
         <!-- Lista de Medicamentos -->
         <div class="flex-grow">
-            <h3 class="text-xl font-bold text-center mb-6 uppercase tracking-widest text-slate-800">Uso Veterinário</h3>
             <div class="space-y-6 text-slate-800">
                 {% for med in receita.medicamentos %}
-                <div class="relative pl-8 pr-2 page-break-inside-avoid shadow-sm p-4 border border-slate-100 rounded bg-white print:border-none print:shadow-none print:p-0 print:pr-0 print:pl-6 print:mb-4">
+                <div class="relative pl-8 pr-2 page-break-inside-avoid shadow-sm p-4 border border-slate-100 rounded bg-white print:border-none print:shadow-none print:p-0 print:pr-0 print:pl-6 print:mb-6">
                     <span class="absolute left-2 top-4 font-bold text-lg text-slate-800 print:top-0 print:left-0">{{ loop.index }}.</span>
                     <div class="flex justify-between items-baseline mb-1">
                         <h4 class="font-bold text-lg text-slate-900 border-b border-black inline-block">{{ med.nome }}</h4>
@@ -75,6 +81,13 @@
                         <span class="font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded print:bg-transparent print:p-0 pl-2">{{ med.concentracao }}</span>
                         {% endif %}
                     </div>
+                    {% if med.modo_uso_lista %}
+                    <div class="flex flex-wrap gap-2 mt-1 mb-2">
+                        {% for modo in med.modo_uso_lista %}
+                        <span class="text-[10px] uppercase font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-100 print:border-slate-300 print:text-slate-800 print:bg-transparent">{{ modo }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                     <p class="text-slate-800 mt-2 whitespace-pre-wrap leading-relaxed print:text-justify">{{ med.posologia }}</p>
                 </div>
                 {% endfor %}
@@ -96,4 +109,22 @@
 
     </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
+<script>
+    function downloadPDF() {
+        const element = document.querySelector('.print-area');
+        const nomeArquivo = 'Receita_{{ receita.paciente_nome }}_{{ receita.data_formatada | replace("/", "-") }}.pdf';
+
+        const opt = {
+            margin: [10, 10, 10, 10],
+            filename: nomeArquivo,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save();
+    }
+</script>
 {% endblock %}

@@ -15,7 +15,7 @@ class Receita(db.Model):
     vet_telefone = db.Column(db.String(30), default="")
 
     tutor_nome = db.Column(db.String(200), nullable=False)
-    tutor_cpf = db.Column(db.String(20), default="")
+    tutor_cpf = db.Column(db.String(20), nullable=False)
     tutor_telefone = db.Column(db.String(30), default="")
 
     paciente_nome = db.Column(db.String(100), nullable=False)
@@ -39,4 +39,11 @@ class Medicamento(db.Model):
     receita_id = db.Column(db.Integer, db.ForeignKey("receitas.id"), nullable=False)
     nome = db.Column(db.String(200), nullable=False)
     concentracao = db.Column(db.String(200), default="")
+    modo_uso = db.Column(db.String(200), default="")
     posologia = db.Column(db.Text, nullable=False)
+
+    @property
+    def modo_uso_lista(self):
+        if not self.modo_uso:
+            return []
+        return [m.strip() for m in self.modo_uso.split(",") if m.strip()]
